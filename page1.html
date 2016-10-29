@@ -14,6 +14,8 @@
 		function preload() {
 			game.load.image('sky', 'assets/sky.png');
 		    game.load.image('ground', 'assets/platform.png');
+		    game.load.image('ground1', 'assets/platform1.png');
+		    game.load.image('ground2', 'assets/platform2.png');
 		    game.load.image('star', 'assets/star.png');
 		    game.load.image('menu', 'assets/number-buttons-90x90.png', 270, 180);
 		    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
@@ -21,7 +23,9 @@
 
 		function create() {
 			game.add.sprite(0, 0, 'sky');
-			
+			//*************************************************************************************
+			//**************************** MENU ***************************************************
+			//*************************************************************************************
 			menu_label = game.add.text(w - 100, 20, 'Pause', { font: '24px Arial', fill: '#000' });
 		    menu_label.inputEnabled = true;
 		    menu_label.events.onInputUp.add(function () {
@@ -33,10 +37,42 @@
 		        menu.anchor.setTo(0.5, 0.5);
 
 		        // And a label to illustrate which menu item was chosen. (This is not necessary)
-		        choiseLabel = game.add.text(w/2, h-150, 'Click outside menu to continue', { font: '30px Arial', fill: '#fff' });
+		        choiseLabel = game.add.text(w/2, h-150, 'Click outside menu to continue', { font: '30px Arial', fill: '#666' });
 		        choiseLabel.anchor.setTo(0.5, 0.5);
 		    });
 			
+		    game.input.onDown.add(unpause, self);
+		    function unpause(event){
+		        if(game.paused){
+		            // Calcul des angles du menu
+		            var x1 = w/2 - 270/2, x2 = w/2 + 270/2,
+		                y1 = h/2 - 180/2, y2 = h/2 + 180/2;
+
+		            // Check si on clique dans sur le menu
+		            if(event.x > x1 && event.x < x2 && event.y > y1 && event.y < y2 ){
+		                // The choicemap is an array that will help us see which item was clicked
+		                var choisemap = ['plateforme normale','plateforme numero 2'];
+
+		                // Get menu local coordinates for the click
+		                var x = event.x - x1,
+		                    y = event.y - y1;
+
+		                // Calculate the choice 
+		                var choise = Math.floor(y / 90);
+		            }
+		            else{
+		                // Remove the menu and the label
+		                menu.destroy();
+		                choiseLabel.destroy();
+
+		                // Unpause the game
+		                game.paused = false;
+		            }
+		        }
+	    	}
+		    //*************************************************************************************
+			//**************************** Fin MENU ***************************************************
+			//*************************************************************************************
 			game.physics.startSystem(Phaser.Physics.ARCADE);
 			var cpt = 0;
 			var abs = 0;
@@ -50,20 +86,20 @@
 			platforms = game.add.group();
 			platforms.enableBody = true;
 			
-			var ground = platforms.create(0, game.world.height - 64, 'ground');
-			ground.scale.setTo(2, 2);
+			var ground = platforms.create(0, game.world.height - 32, 'ground');
+			ground.scale.setTo(16, 1);
 			ground.body.immovable = true;
 			
-			var ledge = platforms.create(400, 400, 'ground');
+			var ledge = platforms.create(300, 350, 'ground1');
 			ledge.body.immovable = true;
-			ledge = platforms.create(-150, 250, 'ground');
+			ledge = platforms.create(150, 450, 'ground2');
     		ledge.body.immovable = true;
 
     		player = game.add.sprite(32, game.world.height - 150, 'dude');
     		game.physics.arcade.enable(player);
     		
-    		player.body.bounce.y = 0.2;
-    		player.body.gravity.y = 300;
+    		player.body.bounce.y = 0.1;
+    		player.body.gravity.y = 500;
     		player.body.collideWorldBounds = true;
 
     		player.animations.add('left', [0, 1, 2, 3], 10, true);
