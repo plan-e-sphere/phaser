@@ -51,7 +51,7 @@
 		            // Check si on clique dans sur le menu
 		            if(event.x > x1 && event.x < x2 && event.y > y1 && event.y < y2 ){
 		                // The choicemap is an array that will help us see which item was clicked
-		                var choisemap = ['plateforme normale','plateforme numero 2'];
+		                var choisemap = ['ground1','ground2'];
 
 		                // Get menu local coordinates for the click
 		                var x = event.x - x1,
@@ -59,6 +59,9 @@
 
 		                // Calculate the choice 
 		                var choise = Math.floor(y / 90);
+		                addPlatforme(choisemap[choise]);
+		                menu.destroy();
+		                choiseLabel.destroy();
 		            }
 		            else{
 		                // Remove the menu and the label
@@ -70,6 +73,8 @@
 		            }
 		        }
 	    	}
+
+	    	
 		    //*************************************************************************************
 			//**************************** Fin MENU ***************************************************
 			//*************************************************************************************
@@ -137,7 +142,6 @@
 		    }
 
 		    if(hitPlatform && saut){
-		    	console.log("fin du saut");
 		    	saut = false;
 		    	speed = 0;
 		    }
@@ -149,6 +153,21 @@
 		        saut = true;
 		    }
 		}
+
+
+		function addPlatforme(plateforme) {
+	    		var new_plateforme = platforms.create(0, 0, plateforme);
+				new_plateforme.body.immovable = false;
+				new_plateforme.inputEnabled = true;
+    			new_plateforme.input.enableDrag();
+    			new_plateforme.events.onDragStop.add(onDragStop, this);
+	    }
+
+	    	function onDragStop(sprite, pointer) {
+	    		sprite.sendToBack();
+	    		console.log(" dropped at x:" + pointer.x + " y: " + pointer.y);
+	    }
+
 
 		function randomVal(max) {
 			var retval = Math.floor(Math.random()*max);
