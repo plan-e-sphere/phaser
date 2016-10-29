@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>premier jeu</title>
+	<script type="text/javascript" src="phaser.min.js"></script>
+</head>
+<body>
+	<script type="text/javascript">
+		var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update });
+		var profil = 4;
+		var saut = false;
+		var speed = 0;
+		var w = 800, h = 600;
+		function preload() {
+			game.load.image('sky', 'assets/sky.png');
+		    game.load.image('ground', 'assets/platform.png');
+		    game.load.image('star', 'assets/star.png');
+		    game.load.image('menu', 'assets/number-buttons-90x90.png', 270, 180);
+		    game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+		}
+
+		function create() {
+			game.add.sprite(0, 0, 'sky');
+			
+			menu_label = game.add.text(w - 100, 20, 'Pause', { font: '24px Arial', fill: '#000' });
+		    menu_label.inputEnabled = true;
+		    menu_label.events.onInputUp.add(function () {
+		        // When the paus button is pressed, we pause the game
+		        game.paused = true;
+
+		        // Then add the menu
+		        menu = game.add.sprite(w/2, h/2, 'menu');
+		        menu.anchor.setTo(0.5, 0.5);
+
+		        // And a label to illustrate which menu item was chosen. (This is not necessary)
+		        choiseLabel = game.add.text(w/2, h-150, 'Click outside menu to continue', { font: '30px Arial', fill: '#fff' });
+		        choiseLabel.anchor.setTo(0.5, 0.5);
+		    });
+			
+			game.physics.startSystem(Phaser.Physics.ARCADE);
+			var cpt = 0;
+			var abs = 0;
+			var ord = 0;
+			while (cpt <10){
+				abs = randomVal(400);
+				ord = randomVal(600);
+				game.add.sprite(ord, abs, 'star');
+				cpt ++ ;
+			}
+			platforms = game.add.group();
+			platforms.enableBody = true;
+			
+			var ground = platforms.create(0, game.world.height - 64, 'ground');
+			ground.scale.setTo(2, 2);
+			ground.body.immovable = true;
+			
+			var ledge = platforms.create(400, 400, 'ground');
+			ledge.body.immovable = true;
+			ledge = platforms.create(-150, 250, 'ground');
+    		ledge.body.immovable = true;
+
+    		player = game.add.sprite(32, game.world.height - 150, 'dude');
+    		game.physics.arcade.enable(player);
+    		
+    		player.body.bounce.y = 0.2;
+    		player.body.gravity.y = 300;
+    		player.body.collideWorldBounds = true;
+
+    		player.animations.add('left', [0, 1, 2, 3], 10, true);
+    		player.animations.add('right', [5, 6, 7, 8], 10, true);
+		}
+
+		function update() {
+			var hitPlatform = game.physics.arcade.collide(player, platforms);
+			var cursors = game.input.keyboard.createCursorKeys();
+			// 0 et 7
+			player.body.velocity.x =speed;
+		    if (cursors.left.isDown)
+		    {
+		        //  Move to the left
+		        speed = -150;
+		        profil = 0;
+		        player.animations.play('left');
+		    }
+		    else if (cursors.right.isDown)
+		    {
+		        //  Move to the right
+		        speed = 150;
+		        profil = 7;
+		        player.animations.play('right');
+		    }
+		    else
+		    {
+		        //  Stand still
+		        if (!saut){
+		        	player.animations.stop();
+		        	player.frame = profil;
+		        	speed = 0;
+		        	//console.log("STOP");
+		        }
+		    }
+
+		    if(hitPlatform && saut){
+		    	console.log("fin du saut");
+		    	saut = false;
+		    	speed = 0;
+		    }
+
+		    //  Allow the player to jump if they are touching the ground.
+		    if (cursors.up.isDown && player.body.touching.down && hitPlatform)
+		    {
+		        player.body.velocity.y = -350;
+		        saut = true;
+		    }
+		}
+
+		function randomVal(max) {
+			var retval = Math.floor(Math.random()*max);
+			return retval;
+		}
+	</script>
+</body>
+</html>
