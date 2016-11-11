@@ -11,6 +11,7 @@
 		var saut = false;
 		var speed = 0;
 		var w = 800, h = 600;
+		var tabNiveaux;
 		function preload() {
 			game.load.image('sky', 'assets/sky.png');
 		    game.load.image('ground', 'assets/platform.png');
@@ -156,18 +157,15 @@
 
 
 		function addPlatforme(plateforme) {
-	    		var new_plateforme = platforms.create(0, 0, plateforme);
-				new_plateforme.body.immovable = false;
-				new_plateforme.inputEnabled = true;
-    			new_plateforme.input.enableDrag();
-    			new_plateforme.events.onDragStop.add(onDragStop, this);
+    		var new_plateforme = game.add.sprite(0, 0, plateforme);
+			new_plateforme.inputEnabled = true;
+			new_plateforme.input.enableDrag(false,true);
+			new_plateforme.events.onDragStop.add(onDragStop, this);
 	    }
 
-	    	function onDragStop(sprite, pointer) {
-	    		sprite.sendToBack();
-	    		console.log(" dropped at x:" + pointer.x + " y: " + pointer.y);
+	    function onDragStop(sprite,pointer) {
+	    	tabNiveaux
 	    }
-
 
 		function randomVal(max) {
 			var retval = Math.floor(Math.random()*max);
